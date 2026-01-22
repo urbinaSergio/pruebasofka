@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver-bancario
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Str0ngP@ssw0rd!"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - bancario-net
+
+  api-bancario:
+    image: api-bancario
+    container_name: api-bancario
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - sqlserver
+    ports:
+      - "8080:8080"
+    environment:
+      QUARKUS_PROFILE: prod
+      QUARKUS_DATASOURCE_DB_KIND: mssql
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:sqlserver://sqlserver:1433;databaseName=bancario_db;encrypt=false
+      QUARKUS_DATASOURCE_USERNAME: sa
+      QUARKUS_DATASOURCE_PASSWORD: Str0ngP@ssw0rd!
+      QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: update
+      QUARKUS_HTTP_HOST: 0.0.0.0
+    networks:
+      - bancario-net
+
+networks:
+  bancario-net:
+    driver: bridge
+
+volumes:
+  sqlserver_data:

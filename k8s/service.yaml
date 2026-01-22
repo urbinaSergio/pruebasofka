@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-bancario
+  namespace: bancario
+spec:
+  selector:
+    app: api-bancario
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
