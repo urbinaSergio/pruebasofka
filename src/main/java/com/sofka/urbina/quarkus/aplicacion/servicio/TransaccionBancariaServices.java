@@ -35,13 +35,13 @@ public class TransaccionBancariaServices implements CrearTransacionBancariaUseCa
     @Override
     public TransaccionBancaria crearTransacionBancaria(TransaccionBancaria transaccion) {
 
-        // 1️⃣ Registrar estado inicial
+
         transaccion.setEstado(EstadoTransaccion.PENDIENTE.toString());
         TransaccionBancaria guardada = guardar(transaccion);
 
         ResultadoTransferencia resultado = ejecutarConReintentos(guardada);
 
-        // 3️⃣ Actualizar estado final
+        
         if ("00".equals(resultado.codigo())) {
             guardada.setEstado(EstadoTransaccion.EXITOSA.toString());
         } else {
